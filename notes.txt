@@ -1,0 +1,28 @@
+-- Local Run --
+pip install -r requirements.txt
+playwright install chromium   # run once to install browser
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+-- Build Docker Image --
+docker build -t boulevard-bot .
+docker run -p 8000:8000 --env BLVD_EMAIL=xxx --env BLVD_PASSWORD=xxx boulevard-bot
+
+-- Found Issues and Solution --
+playwright version should match whats in the Dockerfile
+Playwright requires greenlet==3.1.1 when using version 1.48.0.
+In requirements.txt, pinned major libraries only , instead of usidng pip freeze
+
+✅ Best Practices Checklist
+ Headless mode: Always headless=True.
+ Environment secrets: Never hard-code.
+ Session persistence: Use context.storage_state + mounted volume if needed.
+ Async everywhere: Use async_playwright to avoid blocking.
+ Logging & error handling: Add structured logs for debugging.
+ Scaling: Use job queues (e.g. Celery, Redis) if tasks become heavy
+
+🚀 Example Deployment Flow (Render)
+Push to GitHub.
+Connect repo to Render → New Web Service.
+Set Docker as deploy type.
+Add BLVD_EMAIL and BLVD_PASSWORD in Render → Environment.
+Deploy → API runs at https://your-service.onrender.com/run.
