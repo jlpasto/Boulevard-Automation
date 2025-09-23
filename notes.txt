@@ -1,3 +1,7 @@
+Access Token 
+pit-f2199403-7bee-4e0e-8109-c0065afbd4cb
+
+
 -- Local Run --
 pip install -r requirements.txt
 playwright install chromium   # run once to install browser
@@ -11,6 +15,9 @@ docker run -p 8000:8000 --env BLVD_EMAIL=xxx --env BLVD_PASSWORD=xxx boulevard-b
 playwright version should match whats in the Dockerfile
 Playwright requires greenlet==3.1.1 when using version 1.48.0.
 In requirements.txt, pinned major libraries only , instead of usidng pip freeze
+If this function accepts Request and Background task, browser will not appear 
+async def ghl_webhook(request: Request, background_tasks: BackgroundTasks):
+
 
 ✅ Best Practices Checklist
  Headless mode: Always headless=True.
@@ -26,3 +33,16 @@ Connect repo to Render → New Web Service.
 Set Docker as deploy type.
 Add BLVD_EMAIL and BLVD_PASSWORD in Render → Environment.
 Deploy → API runs at https://your-service.onrender.com/run.
+
+
+🔧 Deployment Steps
+Expose this FastAPI app (Docker, Fly.io, Render, etc.) with HTTPS.
+In GoHighLevel → Settings → Integrations → Webhooks,
+Event: Order Completed
+Method: POST
+URL: https://<your-domain>/webhook/ghl-order
+Content-Type: application/json
+
+🔧 Optional Hardening
+Verify Webhook: Require a secret token header (X-GHL-Secret) and check it.
+Logging/DB: Save order payloads to a database before running Playwright for reliability.
