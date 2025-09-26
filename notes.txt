@@ -1,6 +1,11 @@
 Access Token 
 pit-f2199403-7bee-4e0e-8109-c0065afbd4cb
 
+Test-URL
+http://localhost:8000/webhook-test/ghl-order
+
+Production URL 
+https://boulevard-automation.onrender.com/webhook/ghl-order
 
 -- Local Run --
 pip install -r requirements.txt

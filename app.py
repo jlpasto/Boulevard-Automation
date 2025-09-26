@@ -419,7 +419,7 @@ async def ghl_webhook(request: Request, background_tasks: BackgroundTasks):
 
     #prod
     try:
-        data = sample_order.get("customer", {})
+        data = payload.get("customer", {})
         # create variable current datetime string
         date_str = __import__('datetime').datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         row_values = [data["name"], data["email"], data["phone"], "pending", date_str]
