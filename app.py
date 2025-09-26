@@ -231,7 +231,7 @@ async def run_playwright(sale_data: dict):
     sale_data contains GHL order info.
     """
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False, devtools=True)  # set headless=True for production
+        browser = await p.chromium.launch(headless=True, devtools=False)  # set headless=True for production
         context = await browser.new_context()
         page = await context.new_page()
 
@@ -379,7 +379,7 @@ async def run_playwright(sale_data: dict):
                     charge_btn = page.locator('button[aria-label="Add Other Payment"]')
                     if await charge_btn.is_visible() and await charge_btn.is_enabled():
                         print("Clicking Charge button...")
-                        #await charge_btn.click()
+                        await charge_btn.click()
 
 
             else:
@@ -415,12 +415,31 @@ async def ghl_webhook(request: Request, background_tasks: BackgroundTasks):
     payload = await request.json()
 
     #test only 
-    payload = sample_order
+    #payload = sample_order
+
+    #prod
+    try:
+        data = sample_order.get("customer", {})
+        # create variable current datetime string
+        date_str = __import__('datetime').datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        row_values = [data["name"], data["email"], data["phone"], "pending", date_str]
+        sheet.append_row(row_values)
+        # gspread append_row returns nothing, but you can calculate row index:
+        row_index = len(sheet.get_all_values())  # last row index
+        print(f"Inserted row {row_index} with pending status.")
+    except Exception as e:
+        print("Error inserting row into Google Sheets:", e)
+        raise HTTPException(status_code=500, detail="Error inserting row into Google Sheets.")
 
     # Immediately return 200 to GHL, run automation in background
     print("Background task started...")
-    background_tasks.add_task(run_playwright, payload)
-    return {"status": "Order received", "orderId": payload.get("orderId")}
+    try:
+
+        background_tasks.add_task(run_playwright, payload)
+        return {"status": "success"}
+    except Exception as e:
+        print("Error starting background task:", e)
+        raise HTTPException(status_code=500, detail="Error starting background task.")
 
 
 @app.post("/webhook-test/ghl-order")
