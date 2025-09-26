@@ -231,7 +231,7 @@ async def run_playwright(sale_data: dict):
     sale_data contains GHL order info.
     """
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True, devtools=False)  # set headless=True for production
+        browser = await p.chromium.launch(headless=False, devtools=False)  # set headless=True for production
         context = await browser.new_context()
         page = await context.new_page()
 
@@ -379,7 +379,7 @@ async def run_playwright(sale_data: dict):
                     charge_btn = page.locator('button[aria-label="Add Other Payment"]')
                     if await charge_btn.is_visible() and await charge_btn.is_enabled():
                         print("Clicking Charge button...")
-                        await charge_btn.click()
+                        #await charge_btn.click()
 
 
             else:
@@ -388,7 +388,7 @@ async def run_playwright(sale_data: dict):
 
 
         # Save session
-        await context.storage_state(path=SESSION_FILE)
+        #await context.storage_state(path=SESSION_FILE)
         #pause 20 seconds
         await page.wait_for_timeout(120000)
         await browser.close()
@@ -418,6 +418,8 @@ async def ghl_webhook(request: Request, background_tasks: BackgroundTasks):
     #payload = sample_order
 
     #prod
+
+    print("Received payload:", payload)
     try:
         data = payload.get("customer", {})
         # create variable current datetime string
