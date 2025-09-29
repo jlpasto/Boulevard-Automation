@@ -1,0 +1,5 @@
+Product names can be different
+Price can vary 
+When creating new client -> cart already appears
+Match phone - starts with +1
+
