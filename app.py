@@ -288,7 +288,7 @@ async def create_client_record(page: Page, client: dict) -> bool:
         # Submit the form
         # Hide for testing
         print("Client profile created. (Submission skipped in test mode.)")
-        #await form.locator('button[type="submit"]').click()
+        await form.locator('button[type="submit"]').click()
 
         # await form.get_by_role("button", name="Create client").click()
 
@@ -485,7 +485,7 @@ async def run_playwright(payload: dict):
                         charge_btn = page.locator('button[aria-label="Add Other Payment"]')
                         if await charge_btn.is_visible() and await charge_btn.is_enabled():
                             print("Clicking Charge button...")
-                            #await charge_btn.click()
+                            await charge_btn.click()
 
 
                 else:
