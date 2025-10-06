@@ -48,7 +48,8 @@ creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPE
 client = gspread.authorize(creds)
 
 # Replace with your sheet ID and sheet name
-SPREADSHEET_ID = "1CVJHvISuAmADdmG9GjLM_zzpgD4daQ_CDtEHfvbBjNM"
+#SPREADSHEET_ID = "1CVJHvISuAmADdmG9GjLM_zzpgD4daQ_CDtEHfvbBjNM"
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 SHEET_NAME = "Sheet1"
 
 # Create a worksheet object you can reuse
