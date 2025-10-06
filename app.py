@@ -40,7 +40,9 @@ app = FastAPI()
 
 # 1️⃣ Google Service Account credentials
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-service_account_json = base64.b64decode(os.getenv("GOOGLE_CREDENTIALS_B64")).decode("utf-8")
+# Strip whitespace and newlines that might have been added when setting the env var
+b64_creds = os.getenv("GOOGLE_CREDENTIALS_B64", "").strip().replace("\n", "").replace("\r", "")
+service_account_json = base64.b64decode(b64_creds).decode("utf-8")
 service_account_info = json.loads(service_account_json)
 creds = Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
 

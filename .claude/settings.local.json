@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import base64, json; encoded = open(''encoded_credentials.txt'').read(); decoded = base64.b64decode(encoded).decode(''utf-8''); obj = json.loads(decoded); print(''Valid base64 and JSON''); print(''Project ID:'', obj[''project_id''])\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
