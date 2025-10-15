@@ -365,7 +365,7 @@ async def run_playwright(payload: dict):
     try:
 
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=False, devtools=False)  # set headless=True for production
+            browser = await p.chromium.launch(headless=True, devtools=False)  # set headless=True for production
             context = await browser.new_context()
             page = await context.new_page()
 
