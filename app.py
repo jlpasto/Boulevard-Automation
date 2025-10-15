@@ -223,26 +223,64 @@ async def check_client_record(page: Page, name: str, timeout: int = 10000) -> bo
         True  -> record exists
         False -> no record found
     """
+    # try:
+    #     # Search for client by name
+    #     await page.wait_for_selector("#client-search-input", timeout=10000)
+    #     await page.type("#client-search-input", name)  # replace with order_data name
+
+    #     # check if the no results element appears
+    #     await page.wait_for_timeout(20000)  # wait a bit for search to process
+    #      # Wait for either the "No results found" element or timeout   
+    #     is_visible = await page.is_visible(
+    #         "tbody[data-testid='table-body'] span:has-text('No results found')")
+    #     if is_visible:
+    #         return False
+    #     else:
+    #         return True
+
+    # except TimeoutError:
+    #     # Timed out → records likely exist
+    #     print("Timeout waiting for 'No results found' element. Assuming records do not exist.")
+    #     return False
+
+
     try:
         # Search for client by name
         await page.wait_for_selector("#client-search-input", timeout=10000)
-        await page.type("#client-search-input", name)  # replace with order_data name
-
-        # check if the no results element appears
-        await page.wait_for_timeout(20000)  # wait a bit for search to process
-         # Wait for either the "No results found" element or timeout   
-        is_visible = await page.is_visible(
-            "tbody[data-testid='table-body'] span:has-text('No results found')")
-        if is_visible:
+        await page.type("#client-search-input", name)
+        
+        # Wait for the table body to update after search
+        await page.wait_for_timeout(2000)  # Give search time to initiate
+        
+        # Wait for the table body to be in a final state (either results or no results)
+        # Check for the "No results found" text
+        try:
+            await page.wait_for_selector(
+                "tbody[data-testid='table-body'] span.MuiTypography-textv2HeadingSmall:has-text('No results found')",
+                timeout=15000,
+                state="visible"
+            )
+            # If we reach here, "No results found" is visible
             return False
-        else:
-            return True
-
-    except TimeoutError:
-        # Timed out → records likely exist
-        print("Timeout waiting for 'No results found' element. Assuming records do not exist.")
+        except:
+            # "No results found" didn't appear, so results must exist
+            # Optionally verify there are actual table rows (not the no-results row)
+            try:
+                # Check if there are multiple rows or rows without the colspan attribute
+                # (the no-results row has colspan="4")
+                rows = await page.query_selector_all("tbody[data-testid='table-body'] tr")
+                if len(rows) > 0:
+                    # Check if it's not the "no results" row
+                    first_row_html = await rows[0].inner_html()
+                    if "No results found" not in first_row_html:
+                        return True
+                return False
+            except:
+                return False
+                
+    except Exception as e:
+        print(f"Error during client search: {e}")
         return False
-
 
 async def get_first_client_record(page: Page, name: str) -> dict | None:
     """
@@ -327,7 +365,7 @@ async def run_playwright(payload: dict):
     try:
 
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True, devtools=False)  # set headless=True for production
+            browser = await p.chromium.launch(headless=False, devtools=False)  # set headless=True for production
             context = await browser.new_context()
             page = await context.new_page()
 
@@ -499,7 +537,7 @@ async def run_playwright(payload: dict):
             # Save session
             #await context.storage_state(path=SESSION_FILE)
             #pause 20 seconds
-            await page.wait_for_timeout(120000)
+            await page.wait_for_timeout(100)
             await browser.close()
     except Exception as e:
         sheet.update_cell(payload["row_index"], 16, "failed")  # (row, column, value)
