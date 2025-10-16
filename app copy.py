@@ -329,10 +329,7 @@ async def create_client_record(page: Page, client: dict) -> bool:
         # Submit the form
         # Hide for testing
         print("Client profile created. (Submission skipped in test mode.)")
-        #await form.locator('button[type="submit"]').click()
-        await page.get_by_role("button", name="Save").click()
-
-
+        await form.locator('button[type="submit"]').click()
 
         # await form.get_by_role("button", name="Create client").click()
 
@@ -531,65 +528,6 @@ async def run_playwright(payload: dict):
                             print("Clicking Charge button...")
                             await charge_btn.click()
 
-                    else: 
-                        #no match
-                        print("Client info does not match. Create client")
-                        has_record = await create_client_record(page, client)
-                        print("Rechecked record exists:", has_record)
-
-
-                        await page.click(
-                            'button.tertiary.md-button[aria-label="New Sale"]',
-                            timeout=10000
-                        )
-
-                        # Wait for the checkout modal to appear
-                        await page.wait_for_selector(
-                            'div.modal-dock modal.checkout-modal',
-                            timeout=10000
-                        )
-                        print("New Sale modal opened.")
-
-                        # Fill in product details here
-                        #fl-input-2485
-                        #
-
-                        container = page.locator(
-                            'md-input-container:has(label:has-text("Search by product name, SKU, or barcode"))'
-                        ).nth(0)   # use nth(1), nth(2), etc. for the desired one
-                        await container.click()
-                        print("Typing product name...", title)
-                        await container.type(title)
-
-                        #await page.fill("input[name='fl-input-2485']", sale_payment.get("source", ""))
-                        # wait for a bit to see the product suggestion
-                        #to delete
-                        await page.wait_for_timeout(5000)
-                        #select the first suggestion
-                        await page.keyboard.press("ArrowDown")
-                        await page.keyboard.press("Enter")
-                        #to delete
-                        await page.wait_for_timeout(10000)
-
-                        await page.locator('md-tabs-canvas md-tab-item .target[data-tab="Other"]').click()
-
-                        # select payment method
-                        method_select = page.locator(
-                            'div.MuiSelect-root[role="button"]#mui-component-select-method'
-                        )
-
-                        if await method_select.is_visible():
-                            await method_select.click()
-
-                        await page.locator("span:text('GoHighLevel')").scroll_into_view_if_needed()
-                        await page.click("ul[role='listbox'] span:has-text('GoHighLevel')")
-                        print("Product added to the sale.")
-
-                        # Click Charge button
-                        charge_btn = page.locator('button[aria-label="Add Other Payment"]')
-                        if await charge_btn.is_visible() and await charge_btn.is_enabled():
-                            print("Clicking Charge button...")
-                            await charge_btn.click()
 
                 else:
                     print("No visible rows despite has_record=True")
